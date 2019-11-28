@@ -1,0 +1,49 @@
+@import "colors";
+
+.container-fluid {
+  padding: 0;
+}
+
+.container {
+  max-width: 95%;
+}
+
+header {
+  background-color: $color__deep-cerulean;
+  .navbar-brand {
+    text-transform: uppercase;
+    font-size: 2.2rem;
+    padding: 0;
+    //vertical-align: middle;
+  }
+}
+
+.wheather-weekly {
+  background: no-repeat 100% 65% url('../assets/img/wthr1000x936.jpg');
+  background-size: cover;
+  height: 200px;
+  .town-name {
+    margin-top: 1rem;
+  }
+}
+
+.weekday {
+  display: inline;
+  padding: .2rem .5rem;
+  height: 75px;
+  width: 90px;
+  border-left: 1px solid #ccc;
+  background-color:  $color__plain-white;
+  border-bottom: 7px solid $color__cosmic;
+  align-self: flex-end;
+  font-size: .8rem;
+  &.focused {
+    border: none;
+    border-top: 7px solid $color__cosmic;
+    padding: 1rem;
+    order: -1;
+    height: 125px;
+    width: 300px;
+
+  }
+}
