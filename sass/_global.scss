@@ -10,40 +10,202 @@
 
 header {
   background-color: $color__deep-cerulean;
+
   .navbar-brand {
     text-transform: uppercase;
     font-size: 2.2rem;
     padding: 0;
-    //vertical-align: middle;
   }
 }
 
-.wheather-weekly {
+.search-city {
+  background: no-repeat #ffffff right url("../assets/img/searchIcon.png");
+  background-size: contain;
+}
+
+.weather-weekly {
   background: no-repeat 100% 65% url('../assets/img/wthr1000x936.jpg');
   background-size: cover;
-  height: 200px;
+  height: 250px;
+
   .town-name {
     margin-top: 1rem;
   }
 }
 
+.weekdays {
+  flex-wrap: nowrap;
+  overflow-x: scroll;
+  width: 100%;
+}
+
 .weekday {
   display: inline;
   padding: .2rem .5rem;
-  height: 75px;
-  width: 90px;
+  height: 90px;
+  min-width: 120px;
   border-left: 1px solid #ccc;
-  background-color:  $color__plain-white;
+  background-color: $color__plain-white;
   border-bottom: 7px solid $color__cosmic;
   align-self: flex-end;
   font-size: .8rem;
+
   &.focused {
     border: none;
     border-top: 7px solid $color__cosmic;
-    padding: 1rem;
+    padding: .5rem 1rem 1rem;
     order: -1;
-    height: 125px;
-    width: 300px;
-
+    height: 150px;
+    width: 350px;
   }
 }
+
+.weather-hourly {
+  .hours {
+    flex-wrap: nowrap;
+    padding: 1rem .5rem;
+  }
+  .container {
+    overflow-x: scroll;
+  }
+
+  height: 450px;
+
+  .hour {
+    display: flex;
+    flex-flow: column;
+    justify-content: space-between;
+    min-width: 70px;
+    height: inherit;
+    border-right: 1px solid #ccc;
+
+    .row {
+      margin-left: 0;
+      margin-right: 0;
+      justify-content: center;
+    }
+
+    .icon-celsius {
+      position: relative;
+      bottom: 80px;
+      flex-flow: column;
+      .row:first-child {
+        font-size: 2rem;
+      }
+      .row:last-child {
+        margin-top: .5rem;
+        font-size: 1.25rem;
+        font-weight: bold;
+        i {
+          font-size: 2rem;
+        }
+      }
+    }
+
+    .icon-rainfall-wind {
+      flex-flow: column;
+      .row:first-child, .row:last-child {
+        font-size: 2.5rem;
+      }
+    }
+  }
+}
+
+.line-separator-right {
+  border-right: 1px solid #ccc;
+}
+
+.weather-weekly {
+  .temp {
+    text-align: center;
+    align-self: center;
+  }
+  .day-temp {
+    font-weight: bold;
+  }
+  .weekdays {
+     .focused {
+       font-size: 1.25rem;
+
+       .today {
+         font-size: 1.75rem;
+       }
+       .icon {
+         font-size: 3rem;
+       }
+     }
+   }
+  .weekday {
+    .date {
+      span {
+        color: $color__light-grey;
+      }
+    }
+    .icon {
+      font-size: 2rem;
+      i {
+        margin-left: .5rem;
+      }
+    }
+    .temp {
+      font-size: 1rem;
+    }
+  }
+}
+
+footer {
+  background: no-repeat 0 85% url("../assets/img/wthr1000x936.jpg");
+  background-size: cover;
+  height: 300px;
+}
+//.clear {
+//
+//}
+//
+//.isolated-clouds {
+//
+//}
+//
+//.scattered-clouds {
+//
+//}
+//
+//.overcast {
+//
+//}
+//
+//.light-rain {
+//
+//}
+//
+//.moderate-rain {
+//
+//}
+//.heavy-rain {
+//
+//}
+//
+//.sleet {
+//
+//}
+//
+//.light-snow {
+//
+//}
+//
+//.moderate-snow {
+//
+//}
+//
+//.heavy-snow {
+//
+//}
+//
+//.fog {
+//
+//}
+//
+//.na {
+//
+//}
+
