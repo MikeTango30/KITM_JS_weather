@@ -5,6 +5,8 @@
     const PLACES_URL = 'https://api.meteo.lt/v1/places';
     const URL_SEPARATOR = '/';
     const FORECAST_URL_ENDING = '/forecasts/long-term';
+    const DEFAULT_PLACE =  'kaunas' ;
+
     // code - vietovės kodas.
     // name - vietovės pavadinimas.
     // coordinates - vietovės koordinatės (WGS 84 dešimtainiais laipsniais).
@@ -94,27 +96,39 @@
         locationCoordinates.longitude = position.coords.longitude;
     });
 
+    async function  getData (city) {
+        let response = await fetch(PLACES_URL + URL_SEPARATOR + city + FORECAST_URL_ENDING);
+
+        return await response.json();
+    }
+
+    (async function showData() {
+        const data = await getData(DEFAULT_PLACE);
+        console.log(data)
+    })()
 
     //find city
-    async function findPlace(searchQuery=null) {
-        //searchQuery = 'kaunas';
-        let response = await fetch(PLACES_URL);
-        let placesData = await response.json();
-        for (let placesDataPart of placesData) {
-            if(searchQuery) {
-                if (placesDataPart.code.toLowerCase() === searchQuery || placesDataPart.name.toLowerCase() === searchQuery) {
-                    let place = placesDataPart.code;
-                    const headerCity = document.querySelector('.city');
-                    headerCity.innerText = placesDataPart.name;
-                    // let response = await fetch(PLACES_URL + URL_SEPARATOR + place + FORECAST_URL_ENDING);
-                    // let forecast = await response.json();
-                    // console.log(forecast)
-                }
-            }
-            if(!searchQuery) {
-                //TODO find city by geolocation
-            }
-        }
-    }
+    // (async function findPlace(searchQuery=null) {
+    //     if (!searchQuery) {
+    //         searchQuery = 'kaunas';
+    //     }
+    //     let response = await fetch(PLACES_URL);
+    //     let placesData = await response.json();
+    //     for (let placesDataPart of placesData) {
+    //         if(searchQuery) {
+    //             if (placesDataPart.code.toLowerCase() === searchQuery || placesDataPart.name.toLowerCase() === searchQuery) {
+    //                 let place = placesDataPart.code;
+    //                 const headerCity = document.querySelector('.city');
+    //                 headerCity.innerText = placesDataPart.name;
+    //                 let response = await fetch(PLACES_URL + URL_SEPARATOR + place + FORECAST_URL_ENDING);
+    //                 let forecast = await response.json();
+    //
+    //                for(let tempHour of forecast['forecastTimestamps']) {
+    //                     console.log(tempHour)
+    //                 }
+    //             }
+    //         }
+    //     }
+    // })()
 
 }());

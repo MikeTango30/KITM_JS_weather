@@ -18,10 +18,10 @@ header {
   }
 }
 
-.search-city {
-  background: no-repeat #ffffff right url("../assets/img/searchIcon.png");
-  background-size: contain;
-}
+//.search-city {
+//  background: no-repeat #ffffff right url("../assets/img/searchIcon.png");
+//  background-size: contain;
+//}
 
 .weather-weekly {
   background: no-repeat 100% 65% url('../assets/img/wthr1000x936.jpg');
@@ -61,8 +61,8 @@ header {
 }
 
 .weather-hourly {
-  background: rgb(208,187,212);
-  background: radial-gradient(circle, rgba(208,187,212,1) 88%, rgba(162,0,255,1) 92%, rgba(16,0,36,1) 100%);
+  //background: rgb(208,187,212);
+  //background: radial-gradient(circle, rgba(208,187,212,1) 88%, rgba(162,0,255,1) 92%, rgba(16,0,36,1) 100%);
   .hours {
     flex-wrap: nowrap;
     padding: 1rem .5rem;
