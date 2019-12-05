@@ -123,13 +123,21 @@
 
         const data = await getData(DEFAULT_PLACE);
         let date = new Date(data['forecastTimestamps'][0]['forecastTimeUtc']).getDate();
-        let dayData = data['forecastTimestamps'].filter(item => new Date(item['forecastTimeUtc']).getDate() === date);
-        let dayAverages = {};
-        for (let hour of dayData) {
-            dayAverages.airTemperature = await dayData.reduce((sum, current) => sum + current['airTemperature'], 0) / dayData.length;
-            dayAverages.
-        }
-        console.log(dayAverages)
+        let result = data['forecastTimestamps'].reduce((h, {forecastTimeUtc, airTemperature}) => Object.assign(h, { [forecastTimeUtc]:( h[forecastTimeUtc] || [] ).concat(airTemperature) }), {});
+        console.log(result)
+        // let averagesByDay = [];
+        // for (let hour of data['forecastTimestamps']) {
+        //     if (new Date(hour['forecastTimeUtc']).getDate() === date) {
+        //         let dayData = data['forecastTimestamps'].filter(item => new Date(item['forecastTimeUtc']).getDate() === date);
+        //         let dayAverages = {};
+        //         dayAverages.airTemperature = await dayData.reduce((sum, current) => sum + current['airTemperature'], 0) / dayData.length;
+        //         for (let hour of dayData) {
+        //         }
+        //     }
+        //     averagesByDay.push(dayAverages);
+        //     date = new Date(hour['forecastTimeUtc']).getDate();
+        // }
+        // console.log(averagesByDay)
         // const tempAvg = await temp.reduce((sum, temp) => sum + temp['airTemperature'], 0) / temp.length;
         //console.log(tempAvg);
         // let i = 0;
