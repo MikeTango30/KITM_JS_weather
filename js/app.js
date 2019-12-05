@@ -5,7 +5,7 @@
     const PLACES_URL = 'https://api.meteo.lt/v1/places';
     const URL_SEPARATOR = '/';
     const FORECAST_URL_ENDING = '/forecasts/long-term';
-    const DEFAULT_PLACE =  'kaunas' ;
+    const DEFAULT_PLACE = 'kaunas';
 
     // code - vietovės kodas.
     // name - vietovės pavadinimas.
@@ -19,7 +19,7 @@
 
     // classes according to conditionCode - oro sąlygos, kodas:
     const conClear = 'clear';
-    const conIsolatedClouds ='isolated-clouds';
+    const conIsolatedClouds = 'isolated-clouds';
     const conScatteredClouds = 'scattered-clouds';
     const conOvercast = 'overcast';
     const conLightRain = 'light-rain';
@@ -68,9 +68,9 @@
     };
     // "wi wi-wind wi-from-0-deg"
 
-
+    // Toggle active day
     const weekdays = document.querySelectorAll('.weekday');
-    for(let weekday of weekdays) {
+    for (let weekday of weekdays) {
         weekday.addEventListener('click', function () {
             const days = document.querySelectorAll('.weekday');
             document.querySelector('.focused').querySelector('.weather-info').classList.add('d-none');
@@ -96,15 +96,56 @@
         locationCoordinates.longitude = position.coords.longitude;
     });
 
-    async function  getData (city) {
-        let response = await fetch(PLACES_URL + URL_SEPARATOR + city + FORECAST_URL_ENDING);
+    async function getData(place) {
+        let response = await fetch(PLACES_URL + URL_SEPARATOR + place + FORECAST_URL_ENDING);
 
         return await response.json();
     }
 
+    function aggregateDataByDay(data) {
+        for (let item of data) {
+
+        }
+    }
+
     (async function showData() {
+        let dayWeather = {
+            forecastTimeUtc: null,
+            airTemperature: null,
+            // windSpeed: null,
+            // windGust: null,
+            // windDirection: null,
+            // cloudCover:null,
+            // seaLevelPressure:null,
+            // totalPrecipitation:null,
+            // conditionCode:null,
+    };
+
         const data = await getData(DEFAULT_PLACE);
-        console.log(data)
+        let date = new Date(data['forecastTimestamps'][0]['forecastTimeUtc']).getDate();
+        let dayData = data['forecastTimestamps'].filter(item => new Date(item['forecastTimeUtc']).getDate() === date);
+        let dayAverages = {};
+        for (let hour of dayData) {
+            dayAverages.airTemperature = await dayData.reduce((sum, current) => sum + current['airTemperature'], 0) / dayData.length;
+            dayAverages.
+        }
+        console.log(dayAverages)
+        // const tempAvg = await temp.reduce((sum, temp) => sum + temp['airTemperature'], 0) / temp.length;
+        //console.log(tempAvg);
+        // let i = 0;
+
+        // for (let hour of data['forecastTimestamps']) {
+        //     if (new Date(hour['forecastTimeUtc']).getDate() === day) {
+        //         dayWeather.forecastTimeUtc = hour['forecastTimeUtc'];
+        //         dayWeather.airTemperature += hour['airTemperature'];
+        //         i++;
+        //     } else if (new Date(hour['forecastTimeUtc']).getDate() != day) {
+        //         temp.push(dayWeather);
+        //     }
+        //     day = new Date(hour['forecastTimeUtc']).getDate();
+        // }
+        // console.log(dayWeather.airTemperature/i
+        // ) //vidutine
     })()
 
     //find city
