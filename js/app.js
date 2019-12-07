@@ -1,21 +1,18 @@
 'use strict';
 
-
 (function () {
     const PLACES_URL = 'https://api.meteo.lt/v1/places';
     const URL_SEPARATOR = '/';
-    const FORECAST_URL_ENDING = '/forecasts/long-term';
+    const FORECAST_URL_ENDING = 'forecasts/long-term';
     const DEFAULT_PLACE = 'kaunas';
+    const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-    // code - vietovės kodas.
-    // name - vietovės pavadinimas.
-    // coordinates - vietovės koordinatės (WGS 84 dešimtainiais laipsniais).
-    // airTemperature - oro temperatūra, °C.
-    // windSpeed - vėjo greitis, m/s.
-    // windDirection - vėjo kryptis, °. Reikšmės: 0 - iš šiaurės, 180 - iš pietų ir t. t.
-    // cloudCover - debesuotumas, %. Reikšmės: 100 - debesuota, 0 - giedra.
-    // totalPrecipitation - kritulių kiekis, mm.
-
+    //classes
+    // const weekday = 'weekday';
+    // const row = 'row';
+    // const justifyContentStart = 'justify-content-start';
+    // const col = 'col';
+    // const date = 'date';
 
     // classes according to conditionCode - oro sąlygos, kodas:
     const conClear = 'clear';
@@ -31,6 +28,7 @@
     const conHeavySnow = 'heavy-snow';
     const conFog = 'fog';
     const conNa = 'na';
+    const degreeSymbol = '<i class="wi wi-degrees"></i>';
 
     let weatherIcons = {
         day:
@@ -66,7 +64,9 @@
                 na: '<i class="wi wi-na"></i>'
             }
     };
-    // "wi wi-wind wi-from-0-deg"
+
+    //wind icons. {} degree placeholder
+    // "wi wi-wind wi-from-{0}-deg"
 
     // Toggle active day
     const weekdays = document.querySelectorAll('.weekday');
@@ -96,64 +96,130 @@
         locationCoordinates.longitude = position.coords.longitude;
     });
 
+    //Data and manipulation
     async function getData(place) {
-        let response = await fetch(PLACES_URL + URL_SEPARATOR + place + FORECAST_URL_ENDING);
+        let response = await fetch(PLACES_URL + URL_SEPARATOR + place + URL_SEPARATOR + FORECAST_URL_ENDING);
 
         return await response.json();
     }
 
-    function aggregateDataByDay(data) {
-        for (let item of data) {
+    async function filterDataByDate(data, date) {
+        return data['forecastTimestamps'].filter(item => new Date(item['forecastTimeUtc']).getDate() === date);
+    }
 
+    async function getMinTemp(dayData) {
+        return Math.round(Math.min(dayData
+            .map(data => data['airTemperature'])
+            .sort((a, b) => a - b)[0]));
+    }
+
+    async function getMaxTemp(dayData) {
+        return Math.round(Math.min(dayData
+            .map(data => data['airTemperature'])
+            .sort((a, b) => b - a)[0]));
+    }
+
+    async function createHtmlWeekday(minMaxTempByDate, hourTime, today=false, focused=false) {
+        const weekdays = document.querySelector('.weekdays');
+        const divWeekday = document.createElement('div');
+        divWeekday.classList.add('weekday');
+        today ? divWeekday.classList.add('today') : divWeekday.classList.add('other-day');
+        if (focused) {
+            divWeekday.classList.add('focused')
         }
+        //first row of weekday
+        const divRowDate = document.createElement('div');
+        divRowDate.classList.add('row', 'justify-content-start');
+        const divDate = document.createElement('div');
+        divDate.classList.add('col', 'date');
+        const spanDate = document.createElement('span');
+
+        divDate.textContent = WEEKDAYS[hourTime.getDay()] + ' ';
+        spanDate.textContent = minMaxTempByDate.date;
+
+        divDate.append(spanDate);
+        divRowDate.append(divDate);
+        divWeekday.append(divRowDate);
+
+        //second row of weekday
+        const divRowIconTemp = document.createElement('div');
+        divRowIconTemp.classList.add('row');
+        const divColIconTemp = document.createElement('div');
+        divColIconTemp.classList.add('col', 'icon-temp');
+        const divRowLine = document.createElement('div');
+        divRowLine.classList.add('row', 'line');
+        const divColIcon = document.createElement('div');
+        divColIcon.classList.add('col-6', 'icon');
+
+        divColIcon.innerHTML = weatherIcons.day.lightRain; //hardcoded
+
+        divRowLine.append(divColIcon);
+
+        const divColTemp = document.createElement('div');
+        divColTemp.classList.add('col-6', 'temp');
+        const divRowMaxTemp = document.createElement('div');
+        divRowMaxTemp.classList.add('row');
+        const divColMaxTemp = document.createElement('div');
+        divColMaxTemp.classList.add('col', 'max-temp');
+        const iconDegreeSymbol = document.createElement('i');
+
+        divColMaxTemp.innerHTML = minMaxTempByDate.maxTemperature + degreeSymbol;
+
+        divRowMaxTemp.append(divColMaxTemp);
+        divColTemp.append(divRowMaxTemp);
+
+        const divRowMinTemp = document.createElement('div');
+        divRowMinTemp.classList.add('row');
+        const divColMinTemp = document.createElement('div');
+        divColMinTemp.classList.add('col', 'min-temp');
+
+        divColMinTemp.innerHTML = minMaxTempByDate.minTemperature + degreeSymbol;
+
+        divRowMinTemp.append(divColMinTemp);
+        divColTemp.append(divRowMinTemp);
+
+        divRowLine.append(divColTemp);
+        divColIconTemp.append(divRowLine);
+        divRowIconTemp.append(divColIconTemp);
+        divWeekday.append(divRowIconTemp);
+
+        weekdays.append(divWeekday);
     }
 
     (async function showData() {
-        let dayWeather = {
-            forecastTimeUtc: null,
-            airTemperature: null,
-            // windSpeed: null,
-            // windGust: null,
-            // windDirection: null,
-            // cloudCover:null,
-            // seaLevelPressure:null,
-            // totalPrecipitation:null,
-            // conditionCode:null,
-    };
-
         const data = await getData(DEFAULT_PLACE);
-        let date = new Date(data['forecastTimestamps'][0]['forecastTimeUtc']).getDate();
-        let result = data['forecastTimestamps'].reduce((h, {forecastTimeUtc, airTemperature}) => Object.assign(h, { [forecastTimeUtc]:( h[forecastTimeUtc] || [] ).concat(airTemperature) }), {});
-        console.log(result)
-        // let averagesByDay = [];
-        // for (let hour of data['forecastTimestamps']) {
-        //     if (new Date(hour['forecastTimeUtc']).getDate() === date) {
-        //         let dayData = data['forecastTimestamps'].filter(item => new Date(item['forecastTimeUtc']).getDate() === date);
-        //         let dayAverages = {};
-        //         dayAverages.airTemperature = await dayData.reduce((sum, current) => sum + current['airTemperature'], 0) / dayData.length;
-        //         for (let hour of dayData) {
-        //         }
-        //     }
-        //     averagesByDay.push(dayAverages);
-        //     date = new Date(hour['forecastTimeUtc']).getDate();
-        // }
-        // console.log(averagesByDay)
-        // const tempAvg = await temp.reduce((sum, temp) => sum + temp['airTemperature'], 0) / temp.length;
-        //console.log(tempAvg);
-        // let i = 0;
 
-        // for (let hour of data['forecastTimestamps']) {
-        //     if (new Date(hour['forecastTimeUtc']).getDate() === day) {
-        //         dayWeather.forecastTimeUtc = hour['forecastTimeUtc'];
-        //         dayWeather.airTemperature += hour['airTemperature'];
-        //         i++;
-        //     } else if (new Date(hour['forecastTimeUtc']).getDate() != day) {
-        //         temp.push(dayWeather);
-        //     }
-        //     day = new Date(hour['forecastTimeUtc']).getDate();
-        // }
-        // console.log(dayWeather.airTemperature/i
-        // ) //vidutine
+        //initial date
+        let initialTime = new Date(data['forecastTimestamps'][0]['forecastTimeUtc']);
+        let year = initialTime.getFullYear();
+        let month = initialTime.getMonth();
+        let day = initialTime.getDate();
+
+        let minMaxTempByDate = {};
+        let dayData = null;
+        let dayTime = null;
+
+        for (let hour of data['forecastTimestamps']) {
+            if (!dayTime) {
+                let hourTime = new Date(hour['forecastTimeUtc'])
+                dayTime = hourTime.getDate();
+                dayData = await filterDataByDate(data, dayTime);
+
+                minMaxTempByDate.date = dayTime;
+                minMaxTempByDate.minTemperature = await getMinTemp(dayData);
+                minMaxTempByDate.maxTemperature = await getMaxTemp(dayData);
+                await createHtmlWeekday(minMaxTempByDate, hourTime); //TODO pass params for today & focused classes
+
+            }
+            //check for next day
+            dayTime = new Date(hour['forecastTimeUtc']).getDate();
+            if (year + month + dayTime > year + month + day) {
+                day = dayTime;
+                dayTime = null;
+                dayData = null;
+            }
+        }
+
     })()
 
     //find city
@@ -167,9 +233,19 @@
     //         if(searchQuery) {
     //             if (placesDataPart.code.toLowerCase() === searchQuery || placesDataPart.name.toLowerCase() === searchQuery) {
     //                 let place = placesDataPart.code;
-    //                 const headerCity = document.querySelector('.city');
+    //                 const headerCity = document.querySelector('.city');    const DEFAULT_PLACE = 'kaunas';
+
+    // code - vietovės kodas.
+    // name - vietovės pavadinimas.
+    // coordinates - vietovės koordinatės (WGS 84 dešimtainiais laipsniais).
+    // airTemperature - oro temperatūra, °C.
+    // windSpeed - vėjo greitis, m/s.
+    // windDirection - vėjo kryptis, °. Reikšmės: 0 - iš šiaurės, 180 - iš pietų ir t. t.
+    // cloudCover - debesuotumas, %. Reikšmės: 100 - debesuota, 0 - giedra.
+    // totalPrecipitation - kritulių kiekis, mm.
+
     //                 headerCity.innerText = placesDataPart.name;
-    //                 let response = await fetch(PLACES_URL + URL_SEPARATOR + place + FORECAST_URL_ENDING);
+    //                 let response = await fetch(PLACES_URL + URL_SEPARATOR + place + URL_SEPARATOR + FORECAST_URL_ENDING);
     //                 let forecast = await response.json();
     //
     //                for(let tempHour of forecast['forecastTimestamps']) {
