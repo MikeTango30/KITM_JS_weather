@@ -1,5 +1,8 @@
 'use strict';
+import moment from "moment/moment";
 
+import(moment());
+    console.log(moment().format('2015-12-20'));
 (function () {
     const PLACES_URL = 'https://api.meteo.lt/v1/places';
     const URL_SEPARATOR = '/';
@@ -119,7 +122,7 @@
             .sort((a, b) => b - a)[0]));
     }
 
-    async function createHtmlWeekday(minMaxTempByDate, hourTime, today=false, focused=false) {
+    async function createHtmlWeekdays(minMaxTempByDate, hourTime, today=false, focused=false) {
         const weekdays = document.querySelector('.weekdays');
         const divWeekday = document.createElement('div');
         divWeekday.classList.add('weekday');
@@ -161,7 +164,6 @@
         divRowMaxTemp.classList.add('row');
         const divColMaxTemp = document.createElement('div');
         divColMaxTemp.classList.add('col', 'max-temp');
-        const iconDegreeSymbol = document.createElement('i');
 
         divColMaxTemp.innerHTML = minMaxTempByDate.maxTemperature + degreeSymbol;
 
@@ -186,6 +188,24 @@
         weekdays.append(divWeekday);
     }
 
+    async function createHtmlHourly(dayData) {
+        // code - vietovės kodas.
+        // name - vietovės pavadinimas.
+        // coordinates - vietovės koordinatės (WGS 84 dešimtainiais laipsniais).
+        // airTemperature - oro temperatūra, °C.
+        // windSpeed - vėjo greitis, m/s.
+        // windDirection - vėjo kryptis, °. Reikšmės: 0 - iš šiaurės, 180 - iš pietų ir t. t.
+        // cloudCover - debesuotumas, %. Reikšmės: 100 - debesuota, 0 - giedra.
+        // totalPrecipitation - kritulių kiekis, mm.
+        const hours = document.querySelector('.hours');
+        const divHour = document.createElement('div');
+        divHour.classList.add('hour');
+        const divRowTime = document.createElement('div');
+        divRowTime.classList.add('row');
+        divRowTime.textCotcntent = dayData['forecastTimeUtc'].ge;
+
+    }
+
     (async function showData() {
         const data = await getData(DEFAULT_PLACE);
 
@@ -208,7 +228,7 @@
                 minMaxTempByDate.date = dayTime;
                 minMaxTempByDate.minTemperature = await getMinTemp(dayData);
                 minMaxTempByDate.maxTemperature = await getMaxTemp(dayData);
-                await createHtmlWeekday(minMaxTempByDate, hourTime); //TODO pass params for today & focused classes
+                await createHtmlWeekdays(minMaxTempByDate, hourTime); //TODO pass params for today & focused classes
 
             }
             //check for next day
