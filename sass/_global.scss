@@ -56,7 +56,8 @@ header {
     padding: .5rem 1rem 1rem;
     order: -1;
     height: 150px;
-    width: 350px;
+    min-width: 350px;
+    max-width: 350px;
   }
 }
 
@@ -81,6 +82,12 @@ header {
     height: inherit;
     border-right: 1px solid #ccc;
 
+    .hour-weekday {
+      justify-self: start;
+      height: 100%;
+      font-weight: bold;
+    }
+
     .row {
       margin-left: 0;
       margin-right: 0;
@@ -89,7 +96,7 @@ header {
 
     .icon-celsius {
       position: relative;
-      bottom: 80px;
+      //bottom: 140px;
       flex-flow: column;
       .row:first-child {
         font-size: 2rem;
@@ -106,7 +113,7 @@ header {
 
     .icon-rainfall-wind {
       flex-flow: column;
-      .row:first-child, .row:last-child {
+      .row:first-child, .row:nth-child(3) {
         font-size: 2.5rem;
       }
     }
