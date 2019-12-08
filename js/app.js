@@ -146,7 +146,7 @@
         const divColIcon = document.createElement('div');
         divColIcon.classList.add('col-6', 'icon');
 
-        divColIcon.innerHTML = weatherIcons.day.lightRain; //hardcoded
+        divColIcon.innerHTML = weatherIcons.day.lightRain; //TODO filter corect icon
 
         divRowLine.append(divColIcon);
 
@@ -360,6 +360,8 @@
             })
         }
     }
+    //TODO change hourly data relative to focused weekday
+    //TODO search
     //find city
     // (async function findPlace(searchQuery=null) {
     //     if (!searchQuery) {
