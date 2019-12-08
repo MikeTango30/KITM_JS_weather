@@ -215,7 +215,7 @@
 
     async function getIconCelsiusPositionStep(absoluteTemperatures) {
         let availableSpace = 140;
-        let temperatureDiff = absoluteTemperatures.max - absoluteTemperatures.min;
+        let temperatureDiff = Math.round(absoluteTemperatures.max) - Math.round(absoluteTemperatures.min);
 
         return availableSpace/temperatureDiff;
     }
@@ -233,7 +233,11 @@
         divIconCelsius.classList.add('row', 'icon-celsius');
         //Hourly Icon & Celsius position
         let step = await getIconCelsiusPositionStep(absoluteTemperatures);
-        let divIconCelsiusPosition = step * hour['airTemperature'];
+        let positionCompensator = 0;
+        if (absoluteTemperatures.min < 0) {
+            positionCompensator = (-1) * Math.round(absoluteTemperatures.min);
+        }
+        let divIconCelsiusPosition = step * (Math.round(hour['airTemperature']) + positionCompensator);
         divIconCelsius.setAttribute('style', 'bottom: ' + divIconCelsiusPosition + 'px');
 
         const divRowIcon = document.createElement('div');
