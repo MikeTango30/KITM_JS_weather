@@ -1,8 +1,5 @@
 'use strict';
 
-// let date = new Date(2015, 12, 12, 23, 23, 12);
-// let options = { hour: 'numeric' }
-// console.log(date.toLocaleDateString('lt', options));
 (function () {
     const PLACES_URL = 'https://api.meteo.lt/v1/places';
     const URL_SEPARATOR = '/';
@@ -11,15 +8,6 @@
 
     let dateTimeFormatWeekday = new Intl.DateTimeFormat('en-Us', {weekday: 'short'});
     let dateTimeFormatHour = new Intl.DateTimeFormat('lt', {hour: 'numeric'});
-
-
-
-    //classes
-    // const weekday = 'weekday';
-    // const row = 'row';
-    // const justifyContentStart = 'justify-content-start';
-    // const col = 'col';
-    // const date = 'date';
 
     // classes according to conditionCode - oro sąlygos, kodas:
     const conClear = 'clear';
@@ -333,13 +321,13 @@
                 dayData = null;
             }
         }
-        addToggleActiveDayEvents();
+        addToggleActiveDayEventListeners();
 
     })();
 
 
     // Toggle active day
-    function addToggleActiveDayEvents() {
+    function addToggleActiveDayEventListeners() {
         const weekdays = document.querySelectorAll('.weekday');
         for (let weekday of weekdays) {
             weekday.addEventListener('click', function () {
@@ -374,16 +362,6 @@
     //             if (placesDataPart.code.toLowerCase() === searchQuery || placesDataPart.name.toLowerCase() === searchQuery) {
     //                 let place = placesDataPart.code;
     //                 const headerCity = document.querySelector('.city');    const DEFAULT_PLACE = 'kaunas';
-
-    // code - vietovės kodas.
-    // name - vietovės pavadinimas.
-    // coordinates - vietovės koordinatės (WGS 84 dešimtainiais laipsniais).
-    // airTemperature - oro temperatūra, °C.
-    // windSpeed - vėjo greitis, m/s.
-    // windDirection - vėjo kryptis, °. Reikšmės: 0 - iš šiaurės, 180 - iš pietų ir t. t.
-    // cloudCover - debesuotumas, %. Reikšmės: 100 - debesuota, 0 - giedra.
-    // totalPrecipitation - kritulių kiekis, mm.
-
     //                 headerCity.innerText = placesDataPart.name;
     //                 let response = await fetch(PLACES_URL + URL_SEPARATOR + place + URL_SEPARATOR + FORECAST_URL_ENDING);
     //                 let forecast = await response.json();
