@@ -291,8 +291,10 @@
     }
 
     //generate data and weather content
-    (async function showData() {
-        const data = await getData(DEFAULT_PLACE);
+    async function showData(place=DEFAULT_PLACE, name=DEFAULT_PLACE) {
+        const data = await getData(place);
+        const headerCity = document.querySelector('.city');
+        headerCity.textContent = name.toUpperCase();
 
         //initial date
         let initialTime = new Date(data['forecastTimestamps'][0]['forecastTimeUtc']);
@@ -337,13 +339,12 @@
                 dayData = null;
             }
         }
-        addToggleActiveDayEventListeners();
+        addWeekdayEventListeners();
 
-    })();
-
+    }
 
     // Toggle active day
-    function addToggleActiveDayEventListeners() {
+    function addWeekdayEventListeners() {
         const weekdays = document.querySelectorAll('.weekday');
         for (let weekday of weekdays) {
             weekday.addEventListener('click', function () {
@@ -376,26 +377,36 @@
 
     //TODO search
     //find city
-    (async function findPlace(searchQuery=null) {
+    async function findPlace(searchQuery=null) {
         const headerCity = document.querySelector('.city');
-        if (!searchQuery) {
-            headerCity.innerText = DEFAULT_PLACE.toUpperCase();
+        let response = await fetch(PLACES_URL);
+        let placesData = await response.json();
+        for (let placesDataPart of placesData) {
+            if(searchQuery) {
+                if (placesDataPart.code.toLowerCase() === searchQuery || placesDataPart.name.toLowerCase() === searchQuery) {
+                    let place = placesDataPart.code;
+                    let name = placesDataPart.name;
+                    await showData(place, name);
+                }
+            }
         }
-        // let response = await fetch(PLACES_URL);
-        // let placesData = await response.json();
-        // for (let placesDataPart of placesData) {
-        //     if(searchQuery) {
-        //         if (placesDataPart.code.toLowerCase() === searchQuery || placesDataPart.name.toLowerCase() === searchQuery) {
-        //             let place = placesDataPart.code;
-        //             headerCity.innerText = placesDataPart.name;
-        //             let response = await fetch(PLACES_URL + URL_SEPARATOR + place + URL_SEPARATOR + FORECAST_URL_ENDING);
-        //             let forecast = await response.json();
-        //            //
-                   // for(let tempHour of forecast['forecastTimestamps']) {
-                   //  }
-                // }
-            // }
-        // }
-    })()
+    }
 
+    (async function() {
+        await showData();
+    })();
+
+// TODO: fix search
+        const searchInput = document.querySelector('.search-city');
+        const searchResults = document.querySelector('.search-results');
+
+        searchInput.addEventListener('input', async e => {
+            let target = e.target;
+            let searchQuery = target.value;
+            const weekdays = document.querySelector('.weekdays');
+            const hours = document.querySelector('.hours');
+            weekdays.innerHTML = null;
+            hours.innerHTML = null;
+            await findPlace(searchQuery);
+        });
 }());
