@@ -93,14 +93,11 @@
             .sort((a, b) => b - a)[0]));
     }
 
-    async function createHtmlWeekdays(minMaxTempByDate, hourTime, today=false, focused=false) {
+    async function createHtmlWeekdays(minMaxTempByDate, conditionCode, hourTime, today=false, focused=false) {
         const weekdays = document.querySelector('.weekdays');
         const divWeekday = document.createElement('div');
         divWeekday.classList.add('weekday');
-        if (today) {
-            divWeekday.classList.add('today', 'focused');
-        }
-        today ? divWeekday.classList.add('today') : divWeekday.classList.add('other-day');
+        today ? divWeekday.classList.add('today', 'focused') : divWeekday.classList.add('other-day');
         if (focused) {
             divWeekday.classList.add('focused')
         }
@@ -109,7 +106,7 @@
         divRowDate.classList.add('row', 'justify-content-start');
         const divDate = document.createElement('div');
         divDate.classList.add('col');
-        today ? divDate.classList.add('today') : divDate.classList.add('date')
+        today ? divDate.classList.add('today', 'date') : divDate.classList.add('date');
         divDate.textContent = 'Today';
         if (!today) {
             const spanDate = document.createElement('span');
@@ -134,7 +131,7 @@
         const divColIcon = document.createElement('div');
         divColIcon.classList.add('col-6', 'icon');
 
-        divColIcon.innerHTML = weatherIcons.day.lightRain; //TODO filter corect icon
+        divColIcon.innerHTML = await getWeatherIcon(conditionCode, true);
 
         divRowLine.append(divColIcon);
 
@@ -169,7 +166,8 @@
         if (!today) {
             divWeatherInfo.classList.add('d-none');
         }
-        divWeatherInfo.textContent = 'Cloudy with a chance of Meatballs'; //TODO text?
+        divWeatherInfo.textContent = conditionCode.replace('-', ' ');
+        divWeatherInfo.setAttribute('style', 'text-transform: capitalize');
         divRowIconTemp.append(divWeatherInfo);
         divWeekday.append(divRowIconTemp);
 
@@ -220,7 +218,21 @@
         return availableSpace/temperatureDiff;
     }
 
-    async function createHtmlHourly(hour, absoluteTemperatures) {
+    async function checkHourForNewDate(time, todayFirstHour=false) {
+        const divRowWeekday = document.createElement('div');
+        divRowWeekday.classList.add('row', 'hour-weekday');
+        if (time.getHours() === 0) {
+            divRowWeekday.textContent = dateTimeFormatWeekday.format(time);
+        }
+
+        if (todayFirstHour) {
+            divRowWeekday.textContent = 'Today';
+        }
+
+        return divRowWeekday;
+    }
+
+    async function createHtmlHourly(hour, absoluteTemperatures, todayFirstHour=false) {
         const hours = document.querySelector('.hours');
         const divHour = document.createElement('div');
         divHour.classList.add('hour');
@@ -247,24 +259,14 @@
         let timeOfDay = !(hourTime > 21 && hourTime < 6);
         divRowIcon.innerHTML = await getWeatherIcon(hour['conditionCode'], timeOfDay);
 
-        let time = new Date(hour['forecastTimeUtc']);
-        async function checkHourForNewDate(time) {
-            const divRowWeekday = document.createElement('div');
-            divRowWeekday.classList.add('row', 'hour-weekday');
-            if (time.getHours() === 0) {
-                divRowWeekday.textContent = dateTimeFormatWeekday.format(time);
-            }
-
-            return divRowWeekday;
-        }
-
         const divRowDegree = document.createElement('div');
+
         divRowDegree.classList.add('row');
         divRowDegree.innerHTML = Math.round(hour['airTemperature']) + weatherIcons.other.degreeSymbol;
-
         divIconCelsius.append(divRowIcon, divRowDegree);
 
         const divRowIconRainfallWind = document.createElement('div');
+
         divRowIconRainfallWind.classList.add('row', 'icon-rainfall-wind');
         const divRowRainfall = document.createElement('div');
         divRowRainfall.classList.add('row');
@@ -278,14 +280,17 @@
         const divRowWindSpeed = document.createElement('div');
         divRowWindSpeed.classList.add('row');
         divRowWindSpeed.textContent =  hour['windSpeed'] + 'm/s';
-
         divRowIconRainfallWind.append(divRowRainfall, divRowPrecipitation, divRowWind, divRowWindSpeed);
 
-        divHour.append(divRowTime, await checkHourForNewDate(time), divIconCelsius, divRowIconRainfallWind);
+        let time = new Date(hour['forecastTimeUtc']);
+        let newDayName = todayFirstHour ? await checkHourForNewDate(time, true) : await checkHourForNewDate(time);
+
+        divHour.append(divRowTime, newDayName, divIconCelsius, divRowIconRainfallWind);
 
         hours.append(divHour);
     }
 
+    //generate data and weather content
     (async function showData() {
         const data = await getData(DEFAULT_PLACE);
 
@@ -294,6 +299,7 @@
         let year = initialTime.getFullYear();
         let month = initialTime.getMonth();
         let day = initialTime.getDate();
+        let firstHour = initialTime.getHours();
         let absoluteTemperatures = {};
         absoluteTemperatures.max = await getMaxTemp(data['forecastTimestamps']);
         absoluteTemperatures.min = await getMinTemp(data['forecastTimestamps']);
@@ -311,11 +317,17 @@
                 minMaxTempByDate.date = dayTime;
                 minMaxTempByDate.minTemperature = await getMinTemp(dayData);
                 minMaxTempByDate.maxTemperature = await getMaxTemp(dayData);
+                let conditionCode = hour['conditionCode'];
 
-                await createHtmlWeekdays(minMaxTempByDate, hourTime, firstDay);
+                await createHtmlWeekdays(minMaxTempByDate, conditionCode, hourTime, firstDay);
                 firstDay = false;
             }
-            await createHtmlHourly(hour, absoluteTemperatures);
+            if (new Date(hour['forecastTimeUtc']).getHours() === firstHour) {
+                await createHtmlHourly(hour, absoluteTemperatures, true);
+                firstHour = null;
+            } else {
+                await createHtmlHourly(hour, absoluteTemperatures);
+            }
 
             //check if next day
             dayTime = new Date(hour['forecastTimeUtc']).getDate();
@@ -349,33 +361,41 @@
                 document.querySelector('.focused').querySelector('.weather-info').classList.add('col-7');
                 document.querySelector('.focused').querySelector('.icon-temp').classList.remove('col');
                 document.querySelector('.focused').querySelector('.icon-temp').classList.add('col-5');
+
+                const day = weekday.querySelector('.date').textContent;
+
+                const hourOfDate = document.querySelectorAll('.hour-weekday');
+                for(let hour of hourOfDate) {
+                    if (hour.textContent === day.split(' ', 1).toString()){
+                        hour.scrollIntoView({behavior: "smooth", block: "end", inline: "start"});
+                    }
+                }
             })
         }
     }
-    //TODO change hourly data relative to focused weekday
+
     //TODO search
     //find city
-    // (async function findPlace(searchQuery=null) {
-    //     if (!searchQuery) {
-    //         searchQuery = 'kaunas';
-    //     }
-    //     let response = await fetch(PLACES_URL);
-    //     let placesData = await response.json();
-    //     for (let placesDataPart of placesData) {
-    //         if(searchQuery) {
-    //             if (placesDataPart.code.toLowerCase() === searchQuery || placesDataPart.name.toLowerCase() === searchQuery) {
-    //                 let place = placesDataPart.code;
-    //                 const headerCity = document.querySelector('.city');    const DEFAULT_PLACE = 'kaunas';
-    //                 headerCity.innerText = placesDataPart.name;
-    //                 let response = await fetch(PLACES_URL + URL_SEPARATOR + place + URL_SEPARATOR + FORECAST_URL_ENDING);
-    //                 let forecast = await response.json();
-    //
-    //                for(let tempHour of forecast['forecastTimestamps']) {
-    //                     console.log(tempHour)
-    //                 }
-    //             }
-    //         }
-    //     }
-    // })()
+    (async function findPlace(searchQuery=null) {
+        const headerCity = document.querySelector('.city');
+        if (!searchQuery) {
+            headerCity.innerText = DEFAULT_PLACE.toUpperCase();
+        }
+        // let response = await fetch(PLACES_URL);
+        // let placesData = await response.json();
+        // for (let placesDataPart of placesData) {
+        //     if(searchQuery) {
+        //         if (placesDataPart.code.toLowerCase() === searchQuery || placesDataPart.name.toLowerCase() === searchQuery) {
+        //             let place = placesDataPart.code;
+        //             headerCity.innerText = placesDataPart.name;
+        //             let response = await fetch(PLACES_URL + URL_SEPARATOR + place + URL_SEPARATOR + FORECAST_URL_ENDING);
+        //             let forecast = await response.json();
+        //            //
+                   // for(let tempHour of forecast['forecastTimestamps']) {
+                   //  }
+                // }
+            // }
+        // }
+    })()
 
 }());
