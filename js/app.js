@@ -58,7 +58,7 @@
         other:
             {
                 na: '<i class="wi wi-na"></i>',
-                degreeSymbol:'<i class="wi wi-degrees"></i>',
+                degreeSymbol: '<i class="wi wi-degrees"></i>',
                 raindropSymbol: '<i class="wi wi-raindrops"></i>'
             }
     };
@@ -93,7 +93,7 @@
             .sort((a, b) => b - a)[0]));
     }
 
-    async function createHtmlWeekdays(minMaxTempByDate, conditionCode, hourTime, today=false, focused=false) {
+    async function createHtmlWeekdays(minMaxTempByDate, conditionCode, hourTime, today = false, focused = false) {
         const weekdays = document.querySelector('.weekdays');
         const divWeekday = document.createElement('div');
         divWeekday.classList.add('weekday');
@@ -207,7 +207,7 @@
         }
     }
 
-    async function getWind(degrees){
+    async function getWind(degrees) {
         return "<i class=\"wi wi-wind from-" + degrees + "-deg\"></i>"
     }
 
@@ -215,10 +215,10 @@
         let availableSpace = 140;
         let temperatureDiff = Math.round(absoluteTemperatures.max) - Math.round(absoluteTemperatures.min);
 
-        return availableSpace/temperatureDiff;
+        return availableSpace / temperatureDiff;
     }
 
-    async function checkHourForNewDate(time, todayFirstHour=false) {
+    async function checkHourForNewDate(time, todayFirstHour = false) {
         const divRowWeekday = document.createElement('div');
         divRowWeekday.classList.add('row', 'hour-weekday');
         if (time.getHours() === 0) {
@@ -232,7 +232,7 @@
         return divRowWeekday;
     }
 
-    async function createHtmlHourly(hour, absoluteTemperatures, todayFirstHour=false) {
+    async function createHtmlHourly(hour, absoluteTemperatures, todayFirstHour = false) {
         const hours = document.querySelector('.hours');
         const divHour = document.createElement('div');
         divHour.classList.add('hour');
@@ -279,7 +279,7 @@
         divRowWind.innerHTML = await getWind(hour['windDirection']);
         const divRowWindSpeed = document.createElement('div');
         divRowWindSpeed.classList.add('row');
-        divRowWindSpeed.textContent =  hour['windSpeed'] + 'm/s';
+        divRowWindSpeed.textContent = hour['windSpeed'] + 'm/s';
         divRowIconRainfallWind.append(divRowRainfall, divRowPrecipitation, divRowWind, divRowWindSpeed);
 
         let time = new Date(hour['forecastTimeUtc']);
@@ -291,7 +291,7 @@
     }
 
     //generate data and weather content
-    async function showData(place=DEFAULT_PLACE, name=DEFAULT_PLACE) {
+    async function showData(place = DEFAULT_PLACE, name = DEFAULT_PLACE) {
         const data = await getData(place);
         const headerCity = document.querySelector('.city');
         headerCity.textContent = name.toUpperCase();
@@ -366,8 +366,8 @@
                 const day = weekday.querySelector('.date').textContent;
 
                 const hourOfDate = document.querySelectorAll('.hour-weekday');
-                for(let hour of hourOfDate) {
-                    if (hour.textContent === day.split(' ', 1).toString()){
+                for (let hour of hourOfDate) {
+                    if (hour.textContent === day.split(' ', 1).toString()) {
                         hour.scrollIntoView({behavior: "smooth", block: "end", inline: "start"});
                     }
                 }
@@ -377,13 +377,12 @@
 
     //TODO search
     //find city
-    async function findPlace(searchQuery=null) {
-        const headerCity = document.querySelector('.city');
+    async function findPlace(searchQuery = null) {
         let response = await fetch(PLACES_URL);
         let placesData = await response.json();
         for (let placesDataPart of placesData) {
-            if(searchQuery) {
-                if (placesDataPart.code.toLowerCase() === searchQuery || placesDataPart.name.toLowerCase() === searchQuery) {
+            if (searchQuery) {
+                if (placesDataPart.code.toLowerCase() === searchQuery.toLowerCase() || placesDataPart.name.toLowerCase() === searchQuery.toLowerCase()) {
                     let place = placesDataPart.code;
                     let name = placesDataPart.name;
                     await showData(place, name);
@@ -392,21 +391,39 @@
         }
     }
 
-    (async function() {
+    const datalist = document.querySelector('#searchCity');
+
+    (async function autocomplete() {
+        let response = await fetch(PLACES_URL);
+        let placesData = await response.json();
+
+        for (let placesDataPart of placesData) {
+            let option = document.createElement('option');
+            option.textContent = placesDataPart.name;
+            datalist.append(option);
+        }
+        searchResults.append(datalist);
+
+    })();
+
+
+    (async function () {
         await showData();
     })();
 
-// TODO: fix search
-        const searchInput = document.querySelector('.search-city');
-        const searchResults = document.querySelector('.search-results');
+    const searchInput = document.querySelector('.search-city');
+    searchInput.setAttribute('autocomplete', 'on');
+    searchInput.setAttribute('step', '10');
+    const searchResults = document.querySelector('.search-results');
 
-        searchInput.addEventListener('input', async e => {
-            let target = e.target;
-            let searchQuery = target.value;
-            const weekdays = document.querySelector('.weekdays');
-            const hours = document.querySelector('.hours');
-            weekdays.innerHTML = null;
-            hours.innerHTML = null;
-            await findPlace(searchQuery);
-        });
+    searchInput.addEventListener('input', async e => {
+        e.preventDefault();
+        let target = e.target;
+        let searchQuery = target.value;
+        const weekdays = document.querySelector('.weekdays');
+        const hours = document.querySelector('.hours');
+        weekdays.innerHTML = null;
+        hours.innerHTML = null;
+        await findPlace(searchQuery);
+    });
 }());
