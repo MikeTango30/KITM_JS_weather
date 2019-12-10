@@ -22,8 +22,8 @@
     const conModerateSnow = 'moderate-snow';
     const conHeavySnow = 'heavy-snow';
     const conFog = 'fog';
-    const conNa = 'na';
 
+    //better to leave class strings here & create i elements when they are needed
     let weatherIcons = {
         day:
             {
@@ -340,7 +340,6 @@
             }
         }
         addWeekdayEventListeners();
-
     }
 
     // Toggle active day
@@ -375,7 +374,6 @@
         }
     }
 
-    //TODO search
     //find city
     async function findPlace(searchQuery = null) {
         let response = await fetch(PLACES_URL);
@@ -392,7 +390,9 @@
     }
 
     const datalist = document.querySelector('#searchCity');
-
+    const searchInput = document.querySelector('.search-city');
+    searchInput.setAttribute('autocomplete', 'on');
+    const searchResults = document.querySelector('.search-results');
     (async function autocomplete() {
         let response = await fetch(PLACES_URL);
         let placesData = await response.json();
@@ -406,15 +406,9 @@
 
     })();
 
-
     (async function () {
         await showData();
     })();
-
-    const searchInput = document.querySelector('.search-city');
-    searchInput.setAttribute('autocomplete', 'on');
-    searchInput.setAttribute('step', '10');
-    const searchResults = document.querySelector('.search-results');
 
     searchInput.addEventListener('input', async e => {
         e.preventDefault();
