@@ -403,7 +403,6 @@
             datalist.append(option);
         }
         searchResults.append(datalist);
-
     })();
 
     (async function () {
