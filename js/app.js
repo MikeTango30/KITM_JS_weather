@@ -64,11 +64,11 @@
     };
 
     // current coords
-    let locationCoordinates = {};
-    navigator.geolocation.getCurrentPosition(function (position) {
-        locationCoordinates.latitude = position.coords.latitude;
-        locationCoordinates.longitude = position.coords.longitude;
-    });
+    // let locationCoordinates = {};
+    // navigator.geolocation.getCurrentPosition(function (position) {
+    //     locationCoordinates.latitude = position.coords.latitude;
+    //     locationCoordinates.longitude = position.coords.longitude;
+    // });
 
     //Data and manipulation
     async function getData(place) {
@@ -375,15 +375,18 @@
     }
 
     //find city
+    const weekdays = document.querySelector('.weekdays');
+    const hours = document.querySelector('.hours');
     async function findPlace(searchQuery = null) {
         let response = await fetch(PLACES_URL);
         let placesData = await response.json();
         for (let placesDataPart of placesData) {
             if (searchQuery) {
                 if (placesDataPart.code.toLowerCase() === searchQuery.toLowerCase() || placesDataPart.name.toLowerCase() === searchQuery.toLowerCase()) {
-                    let place = placesDataPart.code;
-                    let name = placesDataPart.name;
-                    await showData(place, name);
+                    //reset page content
+                    weekdays.innerHTML = null;
+                    hours.innerHTML = null;
+                    await showData(placesDataPart.code,  placesDataPart.name);
                 }
             }
         }
@@ -393,7 +396,9 @@
     const searchInput = document.querySelector('.search-city');
     searchInput.setAttribute('autocomplete', 'on');
     const searchResults = document.querySelector('.search-results');
-    (async function autocomplete() {
+
+    //autocomplete
+    (async () => {
         let response = await fetch(PLACES_URL);
         let placesData = await response.json();
 
@@ -405,18 +410,6 @@
         searchResults.append(datalist);
     })();
 
-    (async function () {
-        await showData();
-    })();
-
-    searchInput.addEventListener('input', async e => {
-        e.preventDefault();
-        let target = e.target;
-        let searchQuery = target.value;
-        const weekdays = document.querySelector('.weekdays');
-        const hours = document.querySelector('.hours');
-        weekdays.innerHTML = null;
-        hours.innerHTML = null;
-        await findPlace(searchQuery);
-    });
+    (async () => await showData())();
+    searchInput.addEventListener('input', async e => await findPlace(e.target.value));
 }());
