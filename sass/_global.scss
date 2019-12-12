@@ -62,7 +62,7 @@ header {
   background-color: lighten($color__hay-yellow, 14%);
   border-bottom: 7px solid $color__cosmic;
   align-self: flex-end;
-  font-size: .8rem;
+  font-size: 1.1rem;
 
   &.focused {
     border: none;
@@ -147,12 +147,17 @@ header {
   .weekdays {
      .focused {
        font-size: 1.25rem;
-
+       .temp {
+         font-size: 1.5rem;
+       }
        .today {
          font-size: 1.75rem;
        }
        .icon {
          font-size: 3rem;
+       }
+       .weather-info {
+         font-size: 1.5rem;
        }
      }
    }
@@ -169,7 +174,7 @@ header {
       }
     }
     .temp {
-      font-size: 1rem;
+      font-size: 1.1rem;
     }
   }
 }
