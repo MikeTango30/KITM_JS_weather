@@ -9,7 +9,7 @@
 }
 
 header {
-  background-color: $color__deep-cerulean;
+  background-color: $color__deep-purple;
 
   .navbar-brand {
     text-transform: uppercase;
@@ -19,12 +19,11 @@ header {
       font-size: 2.2rem;
     }
   }
+  .help-text {
+    color: #eee;
+    font-size: 0.75rem;
+  }
 }
-
-//.search-city {
-//  background: no-repeat #ffffff right url("../assets/img/searchIcon.png");
-//  background-size: contain;
-//}
 
 .weather-weekly {
   background: no-repeat 100% 65% url('../assets/img/wthr1000x936.jpg');
@@ -65,8 +64,6 @@ header {
 }
 
 .weather-hourly {
-  //background: rgb(208,187,212);
-  //background: radial-gradient(circle, rgba(208,187,212,1) 88%, rgba(162,0,255,1) 92%, rgba(16,0,36,1) 100%);
   .hours {
     flex-wrap: nowrap;
     padding: 1rem .5rem;
@@ -99,7 +96,6 @@ header {
 
     .icon-celsius {
       position: relative;
-      //bottom: 140px;
       flex-flow: column;
       .row:first-child {
         font-size: 2rem;
@@ -169,55 +165,13 @@ footer {
   background: no-repeat 0 85% url("../assets/img/wthr1000x936.jpg");
   background-size: cover;
   height: 300px;
+  color: $color__deep-purple;
+  a {
+    color: $color__deep-purple;
+    text-decoration: none;
+    :hover {
+      color: $color__deep-purple;
+      text-decoration: underline;
+    }
+  }
 }
-//.clear {
-//
-//}
-//
-//.isolated-clouds {
-//
-//}
-//
-//.scattered-clouds {
-//
-//}
-//
-//.overcast {
-//
-//}
-//
-//.light-rain {
-//
-//}
-//
-//.moderate-rain {
-//
-//}
-//.heavy-rain {
-//
-//}
-//
-//.sleet {
-//
-//}
-//
-//.light-snow {
-//
-//}
-//
-//.moderate-snow {
-//
-//}
-//
-//.heavy-snow {
-//
-//}
-//
-//.fog {
-//
-//}
-//
-//.na {
-//
-//}
-
