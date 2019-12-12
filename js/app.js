@@ -63,13 +63,6 @@
             }
     };
 
-    // current coords
-    // let locationCoordinates = {};
-    // navigator.geolocation.getCurrentPosition(function (position) {
-    //     locationCoordinates.latitude = position.coords.latitude;
-    //     locationCoordinates.longitude = position.coords.longitude;
-    // });
-
     //Data and manipulation
     async function getData(place) {
         let response = await fetch(PLACES_URL + URL_SEPARATOR + place + URL_SEPARATOR + FORECAST_URL_ENDING);
