@@ -23,43 +23,43 @@
     const conHeavySnow = 'heavy-snow';
     const conFog = 'fog';
 
-    //better to leave class strings here & create i elements when they are needed
     let weatherIcons = {
         day:
             {
-                clear: '<i class="wi wi-day-sunny"></i>',
-                isolatedClouds: '<i class="wi wi-day-sunny"></i>',
-                scatteredClouds: '<i class="wi wi-day-cloudy"></i>',
-                overcast: '<i class="wi wi-cloudy"></i>',
-                lightRain: '<i class="wi wi-day-sprinkle"></i>',
-                moderateRain: '<i class="wi wi-day-showers"></i>',
-                heavyRain: '<i class="wi wi-day-rain"></i>',
-                sleet: '<i class="wi wi-day-sleet"></i>',
-                lightSnow: '<i class="wi wi-day-snow"></i>',
-                moderateSnow: '<i class="wi wi-day-snow-wind"></i>',
-                heavySnow: '<i class="wi wi-day-snow-thunderstorm"></i>',
-                fog: '<i class="wi wi-day-fog"></i>'
+                clear: "wi-day-sunny",
+                isolatedClouds: "wi-day-sunny",
+                scatteredClouds: "wi-day-cloudy",
+                overcast:"wi-cloudy",
+                lightRain: "wi-day-sprinkle",
+                moderateRain: "wi-day-showers",
+                heavyRain: "wi-day-rain",
+                sleet: "wi-day-sleet",
+                lightSnow: "wi-day-snow",
+                moderateSnow: "wi-day-snow-wind",
+                heavySnow: "wi-day-snow-thunderstorm",
+                fog: "wi-day-fog"
             },
         night:
             {
-                clear: '<i class="wi wi-night-clear"></i>',
-                isolatedClouds: '<i class="wi wi-night-alt-partly-cloudy"></i>',
-                scatteredClouds: '<i class="wi wi-night-alt-cloudy"></i>',
-                overcast: '<i class="wi wi-cloudy"></i>',
-                lightRain: '<i class="wi wi-night-alt-sprinkle"></i>',
-                moderateRain: '<i class="wi wi-night-alt-showers"></i>',
-                heavyRain: '<i class="wi wi-night-alt-rain"></i>',
-                sleet: '<i class="wi wi-night-alt-sleet"></i>',
-                lightSnow: '<i class="wi wi-night-alt-snow"></i>',
-                moderateSnow: '<i class="wi wi-night-alt-snow-wind"></i>',
-                heavySnow: '<i class="wi wi-night-alt-snow-thunderstorm"></i>',
-                fog: '<i class="wi wi-night-alt-fog"></i>'
+                clear: "wi-night-clear",
+                isolatedClouds: "wi-night-alt-partly-cloudy",
+                scatteredClouds: "wi-night-alt-cloudy",
+                overcast: "wi-cloudy",
+                lightRain: "wi-night-alt-sprinkle",
+                moderateRain: "wi-night-alt-showers",
+                heavyRain: "wi-night-alt-rain",
+                sleet: "wi-night-alt-sleet",
+                lightSnow: "wi-night-alt-snow",
+                moderateSnow: "wi-night-alt-snow-wind",
+                heavySnow: "wi-night-alt-snow-thunderstorm",
+                fog: "wi-night-alt-fog"
             },
         other:
             {
-                na: '<i class="wi wi-na"></i>',
-                degreeSymbol: '<i class="wi wi-degrees"></i>',
-                raindropSymbol: '<i class="wi wi-raindrops"></i>'
+                na: "wi-na",
+                degreeSymbol: "wi-degrees",
+                raindropSymbol: "wi-raindrops",
+                weatherIconClass: 'wi'
             }
     };
 
@@ -131,7 +131,10 @@
         const divColIcon = document.createElement('div');
         divColIcon.classList.add('col-6', 'icon');
 
-        divColIcon.innerHTML = await getWeatherIcon(conditionCode, true);
+        let iconClass = await getWeatherIcon(conditionCode, true);
+        let iconWeather = document.createElement('i');
+        iconWeather.classList.add(weatherIcons.other.weatherIconClass, iconClass);
+        divColIcon.append(iconWeather);
 
         divRowLine.append(divColIcon);
 
@@ -140,9 +143,12 @@
         const divRowMaxTemp = document.createElement('div');
         divRowMaxTemp.classList.add('row');
         const divColMaxTemp = document.createElement('div');
-        divColMaxTemp.classList.add('col', 'max-temp');
 
-        divColMaxTemp.innerHTML = minMaxTempByDate.maxTemperature + weatherIcons.other.degreeSymbol;
+        divColMaxTemp.classList.add('col', 'max-temp');
+        let iconDegree = document.createElement('i');
+        iconDegree.classList.add(weatherIcons.other.weatherIconClass, weatherIcons.other.degreeSymbol);
+        divColMaxTemp.textContent = minMaxTempByDate.maxTemperature;
+        divColMaxTemp.append(iconDegree);
 
         divRowMaxTemp.append(divColMaxTemp);
         divColTemp.append(divRowMaxTemp);
@@ -151,8 +157,10 @@
         divRowMinTemp.classList.add('row');
         const divColMinTemp = document.createElement('div');
         divColMinTemp.classList.add('col', 'min-temp');
-
-        divColMinTemp.innerHTML = minMaxTempByDate.minTemperature + weatherIcons.other.degreeSymbol;
+        iconDegree = document.createElement('i');
+        iconDegree.classList.add(weatherIcons.other.weatherIconClass, weatherIcons.other.degreeSymbol);
+        divColMinTemp.textContent = minMaxTempByDate.minTemperature;
+        divColMinTemp.append(iconDegree);
 
         divRowMinTemp.append(divColMinTemp);
         divColTemp.append(divRowMinTemp);
@@ -207,7 +215,7 @@
         }
     }
 
-    async function getWind(degrees) {
+    async function getWindIcon(degrees) {
         return "<i class=\"wi wi-wind from-" + degrees + "-deg\"></i>"
     }
 
@@ -257,12 +265,18 @@
         //Hourly Icon
         let hourTime = new Date(hour['forecastTimeUtc']).getHours();
         let timeOfDay = !(hourTime > 21 && hourTime < 6);
-        divRowIcon.innerHTML = await getWeatherIcon(hour['conditionCode'], timeOfDay);
+        let iconWeatherCondition = await getWeatherIcon(hour['conditionCode'], timeOfDay);
+        let iconWeather = document.createElement('i');
+        iconWeather.classList.add(weatherIcons.other.weatherIconClass, iconWeatherCondition);
+        divRowIcon.append(iconWeather);
 
         const divRowDegree = document.createElement('div');
 
         divRowDegree.classList.add('row');
-        divRowDegree.innerHTML = Math.round(hour['airTemperature']) + weatherIcons.other.degreeSymbol;
+        let iconDegree = document.createElement('i');
+        iconDegree.classList.add(weatherIcons.other.weatherIconClass, weatherIcons.other.degreeSymbol);
+        divRowDegree.textContent = Math.round(hour['airTemperature']).toString();
+        divRowDegree.append(iconDegree);
         divIconCelsius.append(divRowIcon, divRowDegree);
 
         const divRowIconRainfallWind = document.createElement('div');
@@ -270,13 +284,15 @@
         divRowIconRainfallWind.classList.add('row', 'icon-rainfall-wind');
         const divRowRainfall = document.createElement('div');
         divRowRainfall.classList.add('row');
-        divRowRainfall.innerHTML = weatherIcons.other.raindropSymbol;
+        let iconRainfall = document.createElement('i');
+        iconRainfall.classList.add(weatherIcons.other.weatherIconClass, weatherIcons.other.raindropSymbol);
+        divRowRainfall.append(iconRainfall);
         const divRowPrecipitation = document.createElement('div');
         divRowPrecipitation.classList.add('row');
         divRowPrecipitation.textContent = hour['totalPrecipitation'] + ' mm';
         const divRowWind = document.createElement('div');
         divRowWind.classList.add('row');
-        divRowWind.innerHTML = await getWind(hour['windDirection']);
+        divRowWind.innerHTML = await getWindIcon(hour['windDirection']);
         const divRowWindSpeed = document.createElement('div');
         divRowWindSpeed.classList.add('row');
         divRowWindSpeed.textContent = hour['windSpeed'] + 'm/s';
@@ -412,4 +428,5 @@
 
     (async () => await showData())();
     searchInput.addEventListener('input', async e => await findPlace(e.target.value));
+
 }());
